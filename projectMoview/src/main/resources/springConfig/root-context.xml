@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+	<!-- <property name="jndiName" value="java:comp/env/moview" /> -->
+	<!-- </bean> -->
+	<tx:annotation-driven />
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" p:driverClassName="core.log.jdbc.driver.OracleDriver"
+		p:url="jdbc:oracle:thin:@127.0.0.1:1521:XE" p:username="moview" p:password="moview" />
+
+
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory" p:configLocation="classpath:mybaticConfig/mybatisConfig.xml">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="AdminDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.moviews.admin.dao.AdminDaoService" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="RegisterDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.moviews.main.dao.RegisterDaoService" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="BoardDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.moviews.board.dao.BoardDaoService" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- Root Context: defines shared resources visible to all other web components -->
+</beans>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moviews.admin.dao.AdminDaoService">
+	<!-- user -->
+	<select id="getAllUserCnt" resultType="Integer">
+		select count(*) from
+		mv_user
+		<include refid="userSearchWhere" />
+	</select>
+	<select id="getUserMailCnt" parameterType="Criteria" resultType="Integer">
+		select count(*) from
+		mv_user where userCheck=0
+		<include refid="userSearch" />
+	</select>
+	<select id="getUserCnt" parameterType="java.util.HashMap"
+		resultType="Integer">
+		select count(*) from mv_user
+		where userStatus=#{userStatus}
+		<include refid="userSearch" />
+	</select>
+	<select id="userAllList" parameterType="Criteria" resultType="UListAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from mv_user
+		<include refid="userSearchWhere" />
+		order by userNo desc) human) where rm between (#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="userMailList" parameterType="Criteria" resultType="UListAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from mv_user
+		where userCheck=0
+		<include refid="userSearch" />
+		order by userNo desc) human) where rm between
+		(#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="userList" parameterType="java.util.HashMap"
+		resultType="UListAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from mv_user
+		where userStatus=#{userStatus}
+		<include refid="userSearch" />
+		order by userNo desc)
+		human) where rm between (#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<update id="userStatus" parameterType="java.util.HashMap">
+		update mv_user set
+		userStatus=#{statusNum}, userBlind=sysdate where userNo=#{userNo}
+	</update>
+	<select id="getUserMail" parameterType="Integer" resultType="String">
+		select userMail from
+		mv_user where userNo=#{userNo}
+	</select>
+	<update id="resetPass" parameterType="java.util.HashMap">
+		update mv_user set
+		userPass=#{userPass} where userNo=#{userNo}
+	</update>
+	<sql id="userSearchWhere">
+		<if test="searchType != null">
+			<choose>
+				<when test="searchType == 'na'.toString()">
+					where userName like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'em'.toString()">
+					where userMail like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'no'.toString()">
+					where userNo like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'naemno'.toString()">
+					where (userName like ('%'||#{keyword}||'%')
+					or
+					userMail like ('%'||#{keyword}||'%')
+					or userNo like
+					('%'||#{keyword}||'%'))
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="userSearch">
+		<if test="searchType != null">
+			<choose>
+				<when test="searchType == 'na'.toString()">
+					and userName like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'em'.toString()">
+					and userMail like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'no'.toString()">
+					and userNo like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'naemno'.toString()">
+					and (userName like ('%'||#{keyword}||'%')
+					or userMail
+					like ('%'||#{keyword}||'%')
+					or userNo like ('%'||#{keyword}||'%'))
+				</when>
+			</choose>
+		</if>
+	</sql>
+	
+	<select id="getUserInfo" parameterType="Integer" resultType="UListAdmin">
+		select * from mv_user where userNo=#{userNo}
+	</select>
+	<select id="getUserBoardCnt" parameterType="Integer" resultType="Integer">
+		select count(*) from mv_board where userNo=#{userNo} order by
+		boardDate desc
+	</select>
+	<select id="userBoardList" parameterType="java.util.HashMap"
+		resultType="BoardAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from mv_Board where userNo=#{userNo} order by boardDate desc) human)
+		where rm between (#{pageStart}+1) and (#{pageStart}+#{perPageNum})
+	</select>
+	<update id="blind" parameterType="Integer">
+		update mv_board set
+		boardStatus=1 where boardNo=#{boardNo}
+	</update>
+	<update id="unblind" parameterType="Integer">
+		update mv_board set
+		boardStatus=0 where boardNo=#{boardNo}
+	</update>
+</mapper>

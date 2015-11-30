@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moviews.admin.dao.AdminDaoService">
+	<!-- board -->
+	<select id="getAllBoardCnt" parameterType="Criteria" resultType="Integer">
+		select count( * )from (select a.*, b.userName from mv_board a, mv_user
+		b where a.userNo=b.userNo
+		<include refid="boardSearch" />
+		)
+
+	</select>
+	<select id="getBoardCnt" parameterType="java.util.HashMap"
+		resultType="Integer">
+		select count(*) from (select a.*, b.userName from (select board.*
+		<include refid="boardCategory" />
+		) a, mv_user
+		b where
+		a.userNo=b.userNo
+		<include refid="boardSearch" />
+		) where boardCategory=#{boardCategory}
+	</select>
+	<select id="boardAllList" parameterType="Criteria" resultType="BoardAdmin">
+		select * from (select rownum rm, a.*, b.userName from
+		(select * from
+		mv_board order by boardNo desc) a, mv_user b where
+		a.userNo=b.userNo
+		<include refid="boardSearch" />
+		)where rm between (#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="boardList" parameterType="java.util.HashMap"
+		resultType="BoardAdmin">
+		select * from (select rownum rm, a.*, b.userName from
+		(select * from
+		(select board.*
+		<include refid="boardCategory" />
+		) where boardCategory=#{boardCategory} order by boardNo desc)
+		a,
+		mv_user b where
+		a.userNo=b.userNo
+		<include refid="boardSearch" />
+		)where rm between (#{pageStart}+1)
+		and (#{pageStart}+#{perPageNum})
+	</select>
+	<update id="boardChange" parameterType="java.util.HashMap">
+		update mv_board set
+		boardCategory=#{category},boardBeforeCt=boardCategory
+		where
+		boardNo=#{boardNo}
+	</update>
+	<update id="boardReplace" parameterType="Integer">
+		update mv_board set
+		boardCategory=boardBeforeCt, boardBeforeCt=0 where
+		boardNo=#{boardNo}
+	</update>
+	<insert id="replyQA" parameterType="java.util.HashMap">
+		insert into
+		mv_reply(commentNo,userNo,commentDate,commentContent,commentCall,commentGood,commentStatus,boardNo)
+		values(comment_seq.nextval,#{userNo},default,#{commentContent},default,default,default,#{boardNo})
+	</insert>
+	<update id="writeReply" parameterType="Integer">
+		update board_QandA set
+		boardAnswer=1
+		where boardNo=#{boardNo}
+	</update>
+
+	<select id="getBoardInfo" parameterType="java.util.HashMap"
+		resultType="BoardAdmin">
+		select a.*, b.userName from
+		(select * from (select board.*
+		<include refid="boardCategory" />
+		) where boardNo=#{boardNo} order by boardNo desc) a, mv_user b where
+		a.userNo=b.userNo
+	</select>
+	<select id="getReplyList" parameterType="java.util.HashMap"
+		resultType="ReplyAdmin">
+		select * from (select rownum rm, a.*, b.userName from
+		(select *
+		from mv_reply where boardNo=#{boardNo}
+		order by commentDate
+		desc) a, mv_user b where a.userNo = b.userNo ) where rm between
+		(#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="getFileList" parameterType="Integer" resultType="FileAdmin">
+		select * from mv_files where boardNo=#{boardNo}
+	</select>
+	<select id="getAnswer" parameterType="Integer" resultType="ReplyAdmin">
+		select a.*,b.userName from (select * from mv_reply where
+		boardNo=#{boardNo}) a,mv_user b where a.userNo=b.userNo
+	</select>
+
+	<insert id="writeForm">
+		insert into mv_board
+		(boardNo,boardCategory,boardBeforeCt,boardTitle,userNo,boardContent,boardDate,boardGrupId,boardPos,boardHit,boardStatus)
+		values(board_seq.nextVAL,#{boardCategory},default,#{boardTitle},#{userNo},#{boardContent},default,board_seq.CURRVAL,default,default,default)
+	</insert>
+	<update id="updateForm">
+		update mv_board set
+		boardTitle=#{boardTitle},boardContent=#{boardContent},
+		boardCategory=#{boardCategory} where boardNo=#{boardNo}
+	</update>
+	<insert id="insertFileUpload" parameterType="FileAdmin">
+		insert into mv_files
+		(fileNo,boardNo,fileName,fileSave,fileSize,fileDate)
+		values(fileList_seq.nextval,board_seq.currval,#{fileName},#{fileSave},#{fileSize},#{fileDate})
+	</insert>
+	<insert id="addAttach">
+		insert into mv_files
+		(fileNo,boardNo,fileName,fileSave,fileDate)
+		values(fileList_seq.nextval,board_seq.currval,#{fileName},#{fileSave},#{fileDate})
+	</insert>
+	<insert id="updateAttach">
+		insert into mv_files
+		(fileNo,boardNo,fileName,fileSave,fileDate)
+		values(fileList_seq.nextval,#{boardNo},#{fileName},#{fileSave},#{fileDate})
+	</insert>
+	<sql id="boardSearch">
+		<if test="searchType != null">
+			<choose>
+				<when test="searchType == 'na'.toString()">
+					status.boardGood, status.boardCall from mv_board
+					board, board_status status where board.boardNo=status.boardNo
+				</when>
+				<when test="searchType == 'ti'.toString()">
+					and a.boardTitle like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'no'.toString()">
+					and a.boardNo like ('%'||#{keyword}||'%')
+				</when>
+				<when test="searchType == 'natino'.toString()">
+					and (b.userName like ('%'||#{keyword}||'%')
+					or
+					a.boardTitle like ('%'||#{keyword}||'%')
+					or a.boardNo like
+					('%'||#{keyword}||'%'))
+				</when>
+			</choose>
+		</if>
+	</sql>
+	<sql id="boardCategory">
+		<if test="boardCategory != null">
+			<choose>
+				<when test="boardCategory == 6">
+					, status.boardGood, status.boardCall from mv_board
+					board, board_status status where board.boardNo=status.boardNo
+				</when>
+				<when test="boardCategory == 4">
+					, status.boardGood, status.boardCall,
+					movie.boardRating,movie.movieNo, movieDB.movieNm from mv_board
+					board, board_status
+					status,board_movie movie,mv_movie movieDB where
+					board.boardNo=status.boardNo and
+					board.boardNo=movie.boardNo and
+					movie.movieNo=movieDB.movieNo
+				</when>
+				<when test="boardCategory == 3">
+					, QandA.boardSecret, QandA.boardAnswer from mv_board
+					board, board_QandA QandA where board.boardNo=QandA.boardNo
+				</when>
+
+				<when test="boardCategory == 1">
+					from mv_board board
+				</when>
+				<when test="boardCategory == 0">
+					from mv_board board
+				</when>
+			</choose>
+		</if>
+		<if test="boardCategory == null">
+			from mv_board board
+		</if>
+	</sql>
+</mapper>

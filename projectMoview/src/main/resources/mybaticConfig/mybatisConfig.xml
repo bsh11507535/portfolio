@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25000" />
+		<!-- 전통적인 테이더 베이스 컬럼명 형태인 A-COLUMN을 CamlCase형태로 -->
+		<!-- 자바 프로페티명 형태인 aColumn으로 자동으로 매핑하도록 함 -->
+		<setting name="mapUnderscoreToCamelCase" value="false" />
+		<setting name="jdbcTypeForNull" value="VARCHAR" />
+	</settings>
+	<typeAliases>
+		<typeAlias alias="Criteria" type="com.moviews.page.SearchCriteria" />
+		<typeAlias alias="UListAdmin" type="com.moviews.dto.UserInfoDto" />
+		<typeAlias alias="BoardAdmin" type="com.moviews.dto.BoardDto" />
+		<typeAlias alias="MovieAdmin" type="com.moviews.dto.MovieDto" />
+		<typeAlias alias="EvalAdmin" type="com.moviews.dto.EvalDto" />
+		<typeAlias alias="ReplyAdmin" type="com.moviews.dto.ReplyDto" />
+		<typeAlias alias="FileAdmin" type="com.moviews.dto.FileDto" />
+		<typeAlias alias="BoxofficeAdmin" type="com.moviews.dto.BoxOfficeDto" />
+		
+		<typeAlias alias="board" type="com.moviews.dto.BoardDto" />
+
+	</typeAliases>
+	<mappers>
+		<mapper resource="mapper/admin/AdminMapper.xml" />
+		<mapper resource="mapper/admin/AdminUserMapper.xml" />
+		<mapper resource="mapper/admin/AdminBoardMapper.xml" />
+		<mapper resource="mapper/main/RegisterMapper.xml" />
+		
+		<mapper resource="mapper/board/BoardMapper.xml" />
+	</mappers>
+</configuration>

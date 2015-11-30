@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moviews.admin.dao.AdminDaoService">
+	<!-- login -->
+	<select id="adminLogin" parameterType="UListAdmin"
+		resultType="com.moviews.domain.UserVO">
+		select userNo, userMail, userName, userPass, userAcc, userLevel from
+		mv_user where (userMail=#{userMail} and
+		userLevel=9)
+	</select>
+	<select id="adminNo" parameterType="String" resultType="Integer">
+		select
+		userNo from mv_user where (userMail=#{adminId} and userLevel=9)
+	</select>
+	<!-- movieDB -->
+	<select id="getAllboxofficeCnt" resultType="Integer">
+		select count(*) from
+		(select a.*,b.userName from boxoffice_date a, mv_user b where
+		a.userNo=b.userNo)
+
+	</select>
+	<select id="boxofficeAllList" parameterType="Criteria"
+		resultType="BoxofficeAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from (select a.*,b.userName from boxoffice_date a, mv_user b where
+		a.userNo=b.userNo)
+		order by boxOfDate desc) human) where rm between
+		(#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="getBoxofficeCnt" parameterType="Integer" resultType="Integer">
+		select count(*) from mv_boxoffice where dateNo=#{dateNo}
+
+	</select>
+	<select id="boxoffice" parameterType="Integer" resultType="BoxofficeAdmin">
+		select * from boxoffice_date where dateNo=#{dateNo}
+	</select>
+	<select id="boxofficeList" parameterType="Integer" resultType="BoxofficeAdmin">
+		select * from mv_boxoffice where dateNo=#{dateNo}
+		order by rnum
+	</select>
+
+	<insert id="insertBoxDate" parameterType="java.util.HashMap">
+		insert into
+		boxoffice_date
+		(dateNo,boxOfDate,userNo)
+		values
+		(boxoffice_seq.nextval,#{boxOfDate},#{userNo})
+	</insert>
+	<insert id="insertBoxOffice" parameterType="java.util.HashMap">
+		insert into
+		mv_boxoffice
+		(movieNo,movieNm,rnum,rank,rankInten,salesAcc,audiAcc,openDt,boxOfDate,dateNo)
+		values
+		(#{movieNo},#{movieNm},#{rnum},#{rank},#{rankInten},#{salesAcc},#{audiAcc},#{openDt},#{boxOfDate},boxoffice_seq.currval)
+	</insert>
+
+	<select id="getAllMovieCnt" resultType="Integer">
+		select count(*) from
+		mv_movie
+	</select>
+	<select id="movieAllList" parameterType="Criteria" resultType="MovieAdmin">
+		select * from (select rownum rm, human.* from (select *
+		from mv_movie
+		order by movieNo desc) human) where rm between (#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<select id="getMovieInfo" parameterType="Integer" resultType="MovieAdmin">
+		select * from mv_movie where movieNo=#{movieNo}
+	</select>
+	<select id="getMovieEvalCnt" parameterType="integer" resultType="Integer">
+		select count(*) from mv_eval
+		where movieNo=#{movieNo}
+	</select>
+	<select id="movieEvalList" parameterType="java.util.HashMap"
+		resultType="EvalAdmin">
+		select * from (select rownum rm, a.*, b.userName from
+		(select *
+		from mv_eval where movieNo=#{movieNo}
+		order by evalDate desc)
+		a, mv_user b where a.userNo = b.userNo ) where rm between
+		(#{pageStart}+1) and
+		(#{pageStart}+#{perPageNum})
+	</select>
+	<delete id="movieDelete" parameterType="Integer">
+		delete from mv_movie
+		where movieNo=#{movieNo}
+	</delete>
+	<delete id="posterDelete" parameterType="Integer">
+		delete from mv_files
+		where movieNo=#{movieNo}
+	</delete>
+	<insert id="insertMovie" parameterType="java.util.HashMap">
+		insert into mv_movie
+		(movieNo,movieNm,movieOg,movieShowTm,movieOpenDt,movieNation,movieDirectorNo,movieStory,genreNm,movieWatch,moviePoster,movieTrailer)
+		values
+		(movie_seq.nextval,#{movieNm},#{movieOg},#{movieShowTm},#{movieOpenDt},#{movieNation},#{movieDirectorNo},#{movieStory},#{genreNm},#{movieWatch},#{moviePoster},null)
+	</insert>
+</mapper>

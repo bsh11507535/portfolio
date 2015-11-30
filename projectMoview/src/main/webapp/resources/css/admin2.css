@@ -1,0 +1,78 @@
+@CHARSET "UTF-8";
+
+/* login */
+.login {
+	width: 330px;
+	padding: 10px 10px 5px 10px;
+	margin: 50px auto 0 auto;
+	background-color: #f4f4f4;
+}
+
+.login h2 {
+	text-align: center;
+	margin: 0 0 10px 0;
+}
+.g-recaptcha div div {
+	margin: 0 auto;
+}
+
+.form-group div {
+	padding: 0 auto;
+}
+
+/* /login */
+
+/* header */
+.nav {
+	margin: 13px 0 0 0;
+}
+
+hr {
+	margin-top: 0;
+}
+/* /header */
+
+/* sideBar */
+.panel-title{
+	text-align:center;
+}
+.panel-body * {
+	list-style: none;
+	text-align: right;
+	padding: 0;
+}
+
+/* /sideBar */
+
+/* main */
+.pageTitle {
+	margin: 10px;
+}
+table * {
+	text-align: center;
+}
+
+.paging {
+	text-align: center;
+}
+
+.controlPanel input[type=text]{
+	width: 100px;
+}
+
+/* /main */
+
+
+/* other */
+.error {
+	color: red;
+}
+
+.orangeAlert {
+	color: orange;
+}
+
+.redAlert {
+	font-weight: bold;
+	color: red;
+}
